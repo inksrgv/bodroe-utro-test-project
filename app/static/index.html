@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Бодрое утро — единая программа лояльности</title>
+<style>
+  :root{
+    --bg:#0f0d0b; --panel:#1a1613; --panel2:#221d19; --line:#332b25;
+    --text:#f2ece5; --muted:#a2948a; --accent:#e0a458; --accent2:#7a9a5b;
+    --danger:#d4634a; --ok:#7fb069;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-size:14px;line-height:1.45}
+  header{border-bottom:1px solid var(--line);padding:16px 24px;
+    display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:var(--panel)}
+  .logo{font-weight:700;font-size:18px;letter-spacing:.3px}
+  .logo span{color:var(--accent)}
+  .badge{font-size:11px;text-transform:uppercase;letter-spacing:.8px;
+    border:1px solid var(--line);border-radius:100px;padding:4px 10px;color:var(--muted)}
+  .badge.live{color:var(--ok);border-color:#3d5330}
+  .wrap{display:grid;grid-template-columns:1.15fr 1fr .95fr;gap:18px;padding:20px 24px;
+    align-items:start;max-width:1560px;margin:0 auto}
+  @media(max-width:1180px){.wrap{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .card>h2{margin:0;padding:13px 16px;font-size:12px;text-transform:uppercase;
+    letter-spacing:1px;color:var(--muted);border-bottom:1px solid var(--line);
+    display:flex;justify-content:space-between;align-items:center;font-weight:600}
+  .body{padding:16px}
+  label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.6px;
+    color:var(--muted);margin-bottom:6px}
+  input,select{width:100%;background:var(--panel2);border:1px solid var(--line);
+    border-radius:9px;color:var(--text);padding:10px 12px;font-size:14px;
+    font-family:inherit;outline:none}
+  input:focus,select:focus{border-color:var(--accent)}
+  button{cursor:pointer;border:none;border-radius:9px;padding:10px 14px;font-size:13px;
+    font-weight:600;font-family:inherit;transition:.15s;background:var(--panel2);
+    color:var(--text);border:1px solid var(--line)}
+  button:hover{border-color:var(--accent);color:var(--accent)}
+  button.primary{background:var(--accent);color:#1a1208;border-color:var(--accent)}
+  button.primary:hover{filter:brightness(1.1);color:#1a1208}
+  button.ghost{background:transparent}
+  .row{display:flex;gap:8px}
+  .row>*{flex:1}
+  .mt{margin-top:12px}
+  .balance{font-size:44px;font-weight:800;letter-spacing:-1.5px;line-height:1}
+  .balance small{font-size:15px;font-weight:500;color:var(--muted);letter-spacing:0}
+  .cust{padding:12px;background:var(--panel2);border-radius:11px;border:1px solid var(--line)}
+  .cust .name{font-weight:700;font-size:16px}
+  .cust .meta{color:var(--muted);font-size:12px;margin-top:2px}
+  .pill{display:inline-block;padding:2px 9px;border-radius:100px;font-size:11px;
+    font-weight:600;background:#3a2f22;color:var(--accent)}
+  .time{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .log{max-height:520px;overflow:auto;font-size:12.5px}
+  .log .item{padding:9px 16px;border-bottom:1px solid #241e19;display:flex;gap:9px}
+  .log .item:last-child{border-bottom:none}
+  .log .ico{width:18px;flex:0 0 18px;text-align:center;font-weight:700}
+  .ok{color:var(--ok)} .err{color:var(--danger)} .neu{color:var(--muted)}
+  .msg{margin-top:10px;padding:10px 12px;border-radius:9px;font-size:13px;display:none}
+  .msg.show{display:block}
+  .msg.good{background:#22301c;color:#a9d18a;border:1px solid #3d5330}
+  .msg.bad{background:#331d18;color:#e8937c;border:1px solid #5c2f24}
+  .app-screen{background:linear-gradient(170deg,#241d17,#171310);border-radius:18px;
+    padding:18px;border:1px solid var(--line)}
+  .switch{display:flex;gap:6px;margin-bottom:12px}
+  .switch button{flex:1;font-size:12px;padding:7px}
+  .switch button.on{background:var(--accent);color:#1a1208;border-color:var(--accent)}
+  .stat{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);
+    padding:5px 0;border-bottom:1px dashed #2b241e}
+  .stat:last-child{border:none}
+  .stat b{color:var(--text);font-weight:600}
+  .hint{font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.5}
+  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+  .kpi{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+  .kpi .v{font-size:17px;font-weight:700}
+  .kpi .k{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  code{background:#2a221c;padding:1px 5px;border-radius:4px;font-size:11.5px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Бодрое <span>утро</span></div>
+  <div class="badge live">Инкремент 1 · MVP</div>
+  <div class="badge">Единый сервис лояльности</div>
+  <div class="badge" id="health">API: проверка…</div>
+  <div style="margin-left:auto" class="badge">FR-02…FR-10, FR-15, FR-23</div>
+</header>
+
+<div class="wrap">
+
+  <!-- ================= КАССА ================= -->
+  <div class="card">
+    <h2>Касса · рабочее место бариста <span class="time" id="pos-term">POS-01</span></h2>
+    <div class="body">
+      <label>Идентификация клиента (карта, телефон или последние цифры)</label>
+      <div class="row">
+        <input id="q" placeholder="1000 0001 2345" autocomplete="off">
+        <button class="primary" style="flex:0 0 auto" onclick="lookup()">Найти</button>
+      </div>
+      <div class="hint">Поиск выполняется по индексу — требование NFR-03: не более 2 секунд.</div>
+
+      <div id="pos-card" style="margin-top:14px; display:none">
+        <div class="cust">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <div class="name" id="pos-name">—</div>
+              <div class="meta" id="pos-meta">—</div>
+            </div>
+            <span class="pill" id="pos-status">—</span>
+          </div>
+          <div style="margin-top:14px" class="balance">
+            <span id="pos-balance">0</span> <small>бонусов</small>
+          </div>
+        </div>
+
+        <div class="mt">
+          <label>Сумма чека, ₽</label>
+          <input id="order" type="number" value="420" min="1" step="10">
+        </div>
+        <div class="row mt">
+          <button class="primary" onclick="accrue('pos')">Начислить бонусы</button>
+          <button onclick="redeem('pos')">Списать бонусы</button>
+        </div>
+        <div class="mt">
+          <label>Сколько бонусов списать (кратно 50)</label>
+          <input id="points" type="number" value="100" min="50" step="50">
+        </div>
+        <div class="row mt">
+          <button class="ghost" onclick="doubleSubmit()" title="FR-15: повторная отправка того же запроса">
+            Повторить запрос дважды
+          </button>
+          <button class="ghost" onclick="reverseLast()" title="Компенсирующая проводка">
+            Отменить операцию
+          </button>
+        </div>
+        <div class="hint">Кнопка дублирует отправку с тем же <code>idempotency_key</code> — баланс обязан измениться один раз.</div>
+      </div>
+      <div class="msg" id="pos-msg"></div>
+    </div>
+  </div>
+
+  <!-- ================= ПРИЛОЖЕНИЕ ================= -->
+  <div class="card">
+    <h2>Мобильное приложение · клиент</h2>
+    <div class="body">
+      <div class="switch">
+        <button id="switch-app" class="on" onclick="setChannel('app', this)">В приложении</button>
+        <button id="switch-pos" onclick="setChannel('pos', this)">В кофейне</button>
+      </div>
+
+      <div class="app-screen">
+        <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)">
+          Бонусный счёт
+        </div>
+        <div class="balance" style="margin-top:8px">
+          <span id="app-balance">—</span> <small>бонусов</small>
+        </div>
+        <div class="meta" style="color:var(--muted);font-size:12px;margin-top:6px" id="app-name">
+          Клиент не выбран
+        </div>
+        <div style="margin-top:16px" class="stat"><span>Статус</span><b id="app-status">—</b></div>
+        <div class="stat"><span>Канал операции</span><b id="app-channel">приложение</b></div>
+        <div class="stat"><span>Обновлено</span><b id="app-updated">—</b></div>
+        <button class="primary mt" style="width:100%" onclick="refreshApp()">Обновить баланс</button>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi"><div class="k">Операций</div><div class="v" id="kpi-ops">0</div></div>
+        <div class="kpi"><div class="k">Ср. отклик API</div><div class="v" id="kpi-lat">— мс</div></div>
+      </div>
+
+      <div class="mt">
+        <label>Покупка в приложении (самовывоз)</label>
+        <div class="row">
+          <input id="app-order" type="number" value="300" min="1" step="10">
+          <button style="flex:0 0 auto" onclick="accrue('app')">Оплатить</button>
+        </div>
+      </div>
+      <div class="hint">Приложение не ведёт собственный баланс — оно запрашивает тот же сервис, что и касса.</div>
+    </div>
+  </div>
+
+  <!-- ================= ЖУРНАЛ ================= -->
+  <div class="card">
+    <h2>Журнал операций <button class="ghost" style="padding:4px 9px;font-size:11px" onclick="resetLog()">очистить</button></h2>
+    <div class="log" id="log">
+      <div class="item"><div class="ico neu">·</div><div>Готово к работе. Найдите клиента на кассе.</div></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API = "";
+let customer = null;
+let channel = "app";
+let opCount = 0, latSum = 0, latN = 0;
+
+const $ = id => document.getElementById(id);
+
+function log(kind, text, ms) {
+  const el = document.createElement("div");
+  el.className = "item";
+  const ico = kind === "ok" ? "✓" : kind === "err" ? "✕" : "·";
+  const cls = kind === "ok" ? "ok" : kind === "err" ? "err" : "neu";
+  el.innerHTML = `<div class="ico ${cls}">${ico}</div><div>${text}` +
+    (ms !== undefined ? ` <span class="time">${ms.toFixed(1)} мс</span>` : "") + `</div>`;
+  const box = $("log");
+  box.prepend(el);
+  if (box.children.length > 60) box.lastChild.remove();
+}
+function resetLog(){ $("log").innerHTML = ""; }
+function showMsg(el, ok, text) {
+  const m = $(el);
+  m.className = "msg show " + (ok ? "good" : "bad");
+  m.textContent = text;
+}
+function accountLatency(ms) {
+  latSum += ms; latN++;
+  $("kpi-lat").textContent = (latSum / latN).toFixed(0) + " мс";
+}
+
+async function lookup() {
+  const q = $("q").value.trim();
+  if (!q) return;
+  const r = await fetch(`/api/customers/lookup?q=${encodeURIComponent(q)}`);
+  const d = await r.json();
+  accountLatency(d.elapsed_ms);
+  if (!d.found) {
+    log("err", `Клиент <code>${q}</code> не найден`, d.elapsed_ms);
+    showMsg("pos-msg", false, "Клиент не найден. Проверьте номер карты или телефона.");
+    $("pos-card").style.display = "none";
+    return;
+  }
+  customer = d.customer;
+  renderCustomer();
+  log("ok", `Найден клиент <b>${customer.name}</b> · баланс ${d.balance} б.`, d.elapsed_ms);
+  showMsg("pos-msg", true, `Клиент идентифицирован за ${d.elapsed_ms.toFixed(1)} мс`);
+  $("pos-card").style.display = "block";
+}
+
+function renderCustomer() {
+  if (!customer) return;
+  $("pos-name").textContent = customer.name;
+  $("pos-meta").textContent = `${customer.card_code} · ${customer.phone}`;
+  $("pos-status").textContent = customer.status;
+  $("app-name").textContent = customer.name;
+  $("app-status").textContent = customer.status;
+  refreshApp(true);
+}
+
+async function refreshApp(silent) {
+  if (!customer) return;
+  const r = await fetch(`/api/customers/${customer.id}/balance`);
+  const d = await r.json();
+  const headPos = $("pos-balance").textContent;
+  $("pos-balance").textContent = d.balance;
+  $("app-balance").textContent = d.balance;
+  $("app-updated").textContent = new Date().toLocaleTimeString("ru-RU");
+  if (!silent && headPos !== String(d.balance)) {
+    log("ok", `Баланс синхронизирован: ${d.balance} б. — одинаков в кассе и приложении`);
+  }
+}
+
+function pointsFor() { return parseInt($("points").value || "0", 10); }
+function orderFor(where) {
+  return parseFloat((where === "pos" ? $("order") : $("app-order")).value || "0");
+}
+
+async function accrue(where) {
+  if (!customer) { showMsg("pos-msg", false, "Сначала найдите клиента на кассе."); return; }
+  const amount = orderFor(where);
+  const key = "accr-" + crypto.randomUUID().slice(0, 12);
+  const body = {
+    customer_id: customer.id, order_amount: amount,
+    order_id: "ORD-" + Date.now(), channel: where,
+    terminal_id: where === "pos" ? "POS-01" : "APP",
+    idempotency_key: key
+  };
+  const r = await fetch("/api/operations/accrual", {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body)
+  });
+  const d = await r.json();
+  await afterOp(r.ok, d, where, "начисление");
+}
+
+async function redeem(where) {
+  if (!customer) { showMsg("pos-msg", false, "Сначала найдите клиента на кассе."); return; }
+  const pts = pointsFor();
+  const body = {
+    customer_id: customer.id, points: pts, order_amount: orderFor("pos"),
+    order_id: "ORD-" + Date.now(), channel: where,
+    terminal_id: "POS-01", idempotency_key: "rdm-" + crypto.randomUUID().slice(0, 12)
+  };
+  const r = await fetch("/api/operations/redemption", {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body)
+  });
+  const d = await r.json();
+  await afterOp(r.ok, d, where, `списание ${pts} б.`);
+}
+
+async function doubleSubmit() {
+  if (!customer) { showMsg("pos-msg", false, "Сначала найдите клиента на кассе."); return; }
+  const key = "dup-" + crypto.randomUUID().slice(0, 12);
+  const body = {
+    customer_id: customer.id, points: pointsFor(), order_amount: orderFor("pos"),
+    order_id: "ORD-" + Date.now(), channel: "pos",
+    terminal_id: "POS-01", idempotency_key: key
+  };
+  const send = () => fetch("/api/operations/redemption", {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body)
+  }).then(async r => ({ status: r.status, data: await r.json() }));
+
+  const [a, b] = await Promise.all([send(), send()]);
+  const okA = a.status === 200, okB = b.status === 200;
+  log(okA || okB ? "ok" : "err",
+    `Двойной запрос: ответы ${a.status}/${b.status}, ` +
+    `дубликат ${a.data.duplicate || b.data.duplicate ? "распознан" : "не распознан"}, ` +
+    `баланс ${a.data.balance ?? b.data.balance} б.`);
+  showMsg("pos-msg", true,
+    "Повторная отправка отклонена как дубликат — списание выполнено один раз (FR-15).");
+  await refreshApp(true);
+}
+
+async function afterOp(ok, d, where, label) {
+  opCount++;
+  $("kpi-ops").textContent = opCount;
+  if (d.elapsed_ms !== undefined) accountLatency(d.elapsed_ms);
+
+  if (ok) {
+    const who = where === "pos" ? "касса" : "приложение";
+    log("ok", `${who}: ${label} · ${d.points > 0 ? "+" : ""}${d.points} б. · баланс ${d.balance} б.`,
+        d.elapsed_ms);
+    showMsg("pos-msg", true,
+      `Операция проведена: ${d.points > 0 ? "+" : ""}${d.points} б. Новый баланс ${d.balance} б. ` +
+      `(${d.elapsed_ms.toFixed(1)} мс)`);
+    await refreshApp();
+  } else {
+    const code = d.detail?.error_code || "ERROR";
+    const msg = d.detail?.message || "Не удалось выполнить операцию";
+    log("err", `${label}: ${msg}`, d.elapsed_ms);
+    showMsg("pos-msg", false, `${msg} [${code}]`);
+  }
+}
+
+let lastOpId = null;
+
+async function reverseLast() {
+  if (!customer) { showMsg("pos-msg", false, "Сначала найдите клиента на кассе."); return; }
+  const hist = await (await fetch(`/api/customers/${customer.id}/operations?limit=20`)).json();
+  const target = hist.items.find(i => i.status === "applied" && i.op_type !== "reversal");
+  if (!target) { showMsg("pos-msg", false, "Нет операций для отмены."); return; }
+  const r = await fetch(`/api/operations/${target.id}/reverse`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ idempotency_key: "rev-" + crypto.randomUUID().slice(0, 12),
+                           reason: "Отмена по запросу бариста" })
+  });
+  const d = await r.json();
+  await afterOp(r.ok, d, "pos", `отмена операции ${target.id}`);
+}
+
+function setChannel(ch, btn) {
+  channel = ch;
+  $("app-channel").textContent = ch === "app" ? "приложение" : "кофейня";
+  $("switch-app").classList.toggle("on", ch === "app");
+  $("switch-pos").classList.toggle("on", ch === "pos");
+}
+
+// старт
+(async () => {
+  try {
+    const r = await fetch("/api/health");
+    $("health").textContent = r.ok ? "API: доступен" : "API: недоступен";
+  } catch { $("health").textContent = "API: недоступен"; }
+  $("q").value = "1000 0001 2346";
+  lookup();
+})();
+</script>
+</body>
+</html>
